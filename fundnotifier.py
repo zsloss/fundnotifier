@@ -2,6 +2,9 @@ import sys
 import time
 import http.client
 import json
+import smtplib
+import configparser
+from email.mime.text import MIMEText
 from bs4 import BeautifulSoup
 
 RETRY_DELAY_MINUTES = 10
@@ -17,6 +20,20 @@ def save_json(filename, data):
         fund['latest_value'] = fund.pop('new_value', None)
     with open(filename, 'w') as json_file:
         json.dump(data, json_file, indent=4)
+
+def send_email(body):
+    config = configparser.ConfigParser()
+    config.read('email.cfg')
+    config = config['email']
+    msg = MIMEText(body)
+    msg['Subject'] = "Test Subject"
+    msg['From'] = config['address']
+    msg['To'] = config['address']
+    srv = smtplib.SMTP(config['server'], int(config['port']))
+    if config['secure'].lower() == "true":
+        srv.starttls()
+    srv.login(config['address'], config['password'])
+    srv.send_message(msg)
 
 def get_daily_change(prev, curr):
     return (1 - prev / curr) * 100
@@ -52,4 +69,4 @@ if __name__ == "__main__":
         if all(fund['done'] for fund in data):
             finished = True
     save_json('previous_data_test.json', data)
-            
+                
