@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+        <style>
+h1 {
+    text-align: left;
+    font-family: 'Ubuntu', sans-serif;
+    margin-left: 10px;
+}
+
+.left {
+    background-color:#ccffcc;
+    display: inline-block;
+    width:200px;
+
+}
+
+p {
+    font-size: 18px;
+    font-family: 'Raleway', sans-serif;
+    margin-left: 10px;
+}
+
+.left p {
+    font-style: Verdana;
+    font-style: bold;
+}
+
+.right{
+    display: inline-block;
+    background-color:#ffffcc;
+    width: 300px;
+    margin-left: -10px;
+}
+
+.right p {
+    color:#a6a6a6;
+}
+
+p.positive {
+    color:green;
+}
+
+p.negative {
+    color: red;
+}
+        </style>
+    </head>
+    <body>
+        <h1>Daily Investments Report</h1>
+        <h3>For ${date}</h3>
+
+        ${funds}
+
+    </body>
+</html>
