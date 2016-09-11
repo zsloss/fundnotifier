@@ -64,7 +64,7 @@ def format_money(value):
     return '{0:.2f}'.format(value)
 
 def format_percentage(value):
-    return '{0:+.2f'.format(value)
+    return '{0:+.2f}'.format(value)
 
 def str_profit_or_loss(value):
     if value > 0:
@@ -118,4 +118,4 @@ if __name__ == "__main__":
                     user['done'] = True
         if all(user['done'] for user in data):
             finished = True
-    #save_json('previous_data_test.json', data)
+    save_json('previous_data_test.json', data)
