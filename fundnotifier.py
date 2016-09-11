@@ -24,14 +24,14 @@ def save_json(filename, data):
     with open(filename, 'w') as json_file:
         json.dump(data, json_file, indent=4)
 
-def send_email(body):
+def send_email(to, subject, body):
     config = configparser.ConfigParser()
     config.read('email.cfg')
     config = config['email']
     msg = MIMEText(body, 'html')
-    msg['Subject'] = "Test Subject"
+    msg['Subject'] = subject
     msg['From'] = config['address']
-    msg['To'] = config['address']
+    msg['To'] = to
     srv = smtplib.SMTP(config['server'], int(config['port']))
     if config['secure'].lower() == "true":
         srv.starttls()
@@ -114,8 +114,8 @@ if __name__ == "__main__":
                     if not fund['done'] and get_data_from_morningstar_page(fund):
                         fund['done'] = True
                 if all(fund['done'] for fund in user['funds']):
-                    send_email(make_email(user))
+                    send_email(user['email'], "Daily Investments Report", make_email(user))
                     user['done'] = True
         if all(user['done'] for user in data):
             finished = True
-    save_json('previous_data_test.json', data)
+    save_json('data.json', data)
