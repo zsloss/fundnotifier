@@ -1,4 +1,3 @@
-import sys
 import time
 import http.client
 import json
@@ -9,6 +8,7 @@ from email.mime.text import MIMEText
 from bs4 import BeautifulSoup
 
 RETRY_DELAY_MINUTES = 10
+MAX_RETRIES = 20
 
 def load_json(filename):
     with open(filename, 'r') as json_file:
@@ -102,6 +102,7 @@ def get_data_from_morningstar_page(data):
 
 if __name__ == "__main__":
     finished = False
+    retries = 0
     data = load_json('data.json')
     while not finished:
         for user in data:
@@ -118,4 +119,10 @@ if __name__ == "__main__":
                     user['done'] = True
         if all(user['done'] for user in data):
             finished = True
-    save_json('data.json', data)
+        if not finished:
+            retries += 1
+            if retries > MAX_RETRIES:
+                break
+            time.sleep(60 * RETRY_DELAY_MINUTES)
+    if finished:
+        save_json('data.json', data)
