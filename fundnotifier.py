@@ -1,3 +1,4 @@
+import os
 import time
 import http.client
 import json
@@ -9,9 +10,10 @@ from bs4 import BeautifulSoup
 
 RETRY_DELAY_MINUTES = 10
 MAX_RETRIES = 20
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def load_json(filename):
-    with open(filename, 'r') as json_file:
+    with open(os.path.join(ROOT_DIR, filename), 'r') as json_file:
         return json.load(json_file)
 
 def save_json(filename, data):
@@ -21,12 +23,12 @@ def save_json(filename, data):
             fund.pop('done', None)
             fund['previous_date'] = fund.pop('new_date', None)
             fund['previous_value'] = fund.pop('new_value', None)
-    with open(filename, 'w') as json_file:
+    with open(os.path.join(ROOT_DIR, filename), 'w') as json_file:
         json.dump(data, json_file, indent=4)
 
 def send_email(to, subject, body):
     config = configparser.ConfigParser()
-    config.read('email.cfg')
+    config.read(os.path.join(ROOT_DIR, 'email.cfg'))
     config = config['email']
     msg = MIMEText(body, 'html')
     msg['Subject'] = subject
@@ -39,7 +41,7 @@ def send_email(to, subject, body):
     srv.send_message(msg)
 
 def get_template(name):
-    with open(name + "_template.html") as f:
+    with open(os.path.join(ROOT_DIR, name + "_template.html")) as f:
         return f.read()
 
 def make_email(data):
@@ -96,7 +98,12 @@ def get_data_from_morningstar_page(data):
     if (latest_close_row is not None):
         data['new_date'] = latest_close_row.select_one("span.heading").get_text()
         if data['previous_date'] != data['new_date']:
-            data['new_value'] = float(latest_close_row.select_one("td.text").get_text()[4:])
+            valueText = latest_close_row.select_one("td.text").get_text()
+            valueType = valueText[:3]
+            valueNumber = float(valueText[4:])
+            if valueType == 'GBP':
+                valueNumber = valueNumber * 100
+            data['new_value'] = valueNumber
             return True
     return False
 
